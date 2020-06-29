@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import shortid from 'shortid';
 import styles from './ContactForm.module.css';
 
 class ContactForm extends Component {
@@ -14,9 +13,6 @@ class ContactForm extends Component {
     number: '',
   };
 
-  nameInputId = shortid.generate();
-  numberInputId = shortid.generate();
-
   handleChange = event => {
     const { name, value } = event.currentTarget;
 
@@ -25,15 +21,21 @@ class ContactForm extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    const { name } = this.state;
+    const { name, number } = this.state;
     const { existingContactsName } = this.props;
     const reviewExistingContactsNames = existingContactsName().includes(
       name.toLowerCase(),
     );
 
-    reviewExistingContactsNames
-      ? alert(`${name} is already in contacts`)
-      : this.props.onSubmit(this.state);
+    if (reviewExistingContactsNames) {
+      alert(`${name} is already in contacts`);
+    } else if (!name || !number) {
+      alert('Fill the form');
+    } else if (name.length < 3) {
+      alert('Name should have more than 3 letters');
+    } else {
+      this.props.onSubmit(this.state);
+    }
 
     this.reset();
   };
@@ -53,7 +55,6 @@ class ContactForm extends Component {
             name="name"
             value={name}
             onChange={this.handleChange}
-            id={this.nameInputId}
             className={styles.formInput}
           />
         </label>
@@ -65,7 +66,6 @@ class ContactForm extends Component {
             name="number"
             value={number}
             onChange={this.handleChange}
-            id={this.numberInputId}
             className={styles.formInput}
           />
         </label>
